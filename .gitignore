@@ -2,3 +2,5 @@
 /project_files/Release/*
 /project_files/Debug/*
 /output/*
+/server/Release/*
+/server/Debug/*
