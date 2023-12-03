@@ -1,5 +1,4 @@
 #include "../stdafx.h"
-#include <ctime>
 
 void CConsole::Init()
 {
@@ -13,16 +12,19 @@ void CConsole::Init()
 
 void CConsole::Print(const char* format, ...)
 {
-	va_list args;
-	va_start(args, format);
+    va_list args;
+    va_start(args, format);
 
-	time_t now = time(0);
-	struct tm* timeinfo = localtime(&now);
-	char timeStr[9];
-	strftime(timeStr, sizeof(timeStr), "%H:%M:%S", timeinfo);
+    time_t now = time(0);
+    struct tm* timeinfo = localtime(&now);
+    char timeStr[9];
+    strftime(timeStr, sizeof(timeStr), "%H:%M:%S", timeinfo);
 
-	printf("[%s] ", timeStr);
-	vprintf(format, args);
-	va_end(args);
-	printf("\n");
+    char buffer[256];
+    vsprintf(buffer, format, args);
+    std::string message = buffer;
+
+    printf("[%s] %s", timeStr, message.c_str());
+    va_end(args);
+    printf("\n");
 }

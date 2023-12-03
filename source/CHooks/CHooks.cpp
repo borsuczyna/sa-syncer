@@ -20,9 +20,37 @@ bool CHooks::SetBranchPointer(uintptr_t currentAddress, uintptr_t src, injector:
 
 void PlayersPatches()
 {
+    // Unlock pads count
+    patch::SetUChar(0x84E1FA + 1, MAX_SERVER_PLAYERS);
+    patch::SetUChar(0x856465 + 1, MAX_SERVER_PLAYERS);
+
+    CHooks::Patch_Funcs.push_back([](uint32_t Address) -> bool
+    {
+        uint32_t Content = patch::GetUInt(Address, false);
+        if (Content == 0xB73458)
+        {
+            patch::Set(Address, CPlayerManager::Pads, false);
+        }
+        else if (Content > 0xB73458 && Content <= 0xB73458 + sizeof(CPad) && (*(unsigned char*)(Address) != 0xE8))
+        {
+            uint32_t offset = (Content - 0xB73458);
+            patch::Set(Address, uint32_t(CPlayerManager::Pads) + offset, false);
+        }
+        else return false;
+
+        return true;
+    });
+
+    CHooks::Patch_Funcs.push_back([](uint32_t Address) -> bool
+	{
+		return CHooks::AdjustBranchPointer(Address, 0x53FB70, CPlayerHooks::GetPad, false);
+	});
+
     // Unlock players count
     patch::SetUChar(0x84E98A + 1, MAX_SERVER_PLAYERS);
     patch::SetUChar(0x856505 + 1, MAX_SERVER_PLAYERS);
+
+    CWorld::Players = CPlayerManager::Players;
 
     CHooks::Patch_Funcs.push_back([](uint32_t Address) -> bool
     {
@@ -44,6 +72,21 @@ void PlayersPatches()
     });
 }
 
+void PlayerControlsHooks()
+{
+    CHooks::Patch_Funcs.push_back([](uint32_t Address) -> bool
+	{
+		return CHooks::AdjustBranchPointer(Address, 0x609FF0, CPlayerHooks::GetPlayerInfoForThisPlayerPed, false);
+	});
+
+    CHooks::Patch_Funcs.push_back([](uint32_t Address) -> bool
+    {
+        return CHooks::AdjustBranchPointer(Address, 0x56E0D0, CPlayerHooks::FindPlayerVehicleHook, false);
+    });
+
+    patch::SetPointer(0x86D190, CPlayerHooks::ProcessControl);
+}
+
 void ExecuteEXEPatches()
 {
     auto starttime = GetTickCount();
@@ -63,5 +106,6 @@ void ExecuteEXEPatches()
 void CHooks::Init()
 {
     PlayersPatches();
+    PlayerControlsHooks();
     ExecuteEXEPatches();
 }

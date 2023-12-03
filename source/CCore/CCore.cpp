@@ -3,16 +3,6 @@
 char CCore::m_szNickname[MAX_NAME];
 int CCore::m_iTickRate = TICK_RATE;
 
-void HandleInitLocalPlayer()
-{
-    static bool bLocalPlayerInitialized = false;
-
-    if (!bLocalPlayerInitialized)
-    {
-        CPlayerManager::InitLocalPlayer();
-    }
-}
-
 void HandleServerConnecting()
 {
     static ULONGLONG lastKeyPress = 0;
@@ -55,9 +45,11 @@ void CCore::GameLaunch()
     // Packet listeners
     CPlayerPackets::Init();
 
+    // Managers
+    CPlayerManager::Init();
+
     Events::drawingEvent += []()
     {
-        HandleInitLocalPlayer();
 		HandleServerConnecting();
 	};
 }

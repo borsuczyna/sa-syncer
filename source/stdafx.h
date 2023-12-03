@@ -1,6 +1,8 @@
 #include <enet/enet.h>
 #include <vector>
 #include <thread>
+#include <ctime>
+#include "Windows.h"
 
 #include "plugin.h"
 #include "CPlayerInfo.h"
@@ -8,10 +10,12 @@
 #include "CLoadingScreen.h"
 #include "CWorld.h"
 #include "CStreaming.h"
+#include "CCamera.h"
 
 using namespace plugin;
 
 #include "../shared/CPackets.h"
+#include "../shared/CInterpolate.h"
 
 #include "CTimers/CTimers.h"
 #include "CUtils/CNickGenerator.h"

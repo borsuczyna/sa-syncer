@@ -232,6 +232,33 @@ void MenuPatches()
     patch::ReplaceFunction(0x7453F0, psMouseSetPos);
 }
 
+void LimitPatches()
+{
+    //Inc task pool
+    patch::SetUChar(0x551140, 0xFF);
+
+    //Inc ped pool pool
+    patch::SetUChar(0x550FF2, 1000);
+
+    //Inc intelligence pool
+    patch::SetUChar(0x551283, 210);
+
+    //Inc event pool
+    patch::SetUChar(0x551178, 0x01);
+
+    //Inc matrices pool
+    patch::SetUChar(0x54F3A2, 0x10);
+
+    //Inc ccolmodel pool
+    patch::SetUChar(0x551108, 0x77);
+
+    //Inc dummies pool
+    patch::SetUChar(0x5510D0, 0x0F);
+
+    //Inc objects pool
+    patch::SetUChar(0x551098, 0x02);
+}
+
 bool CPatches::IsWindowFocused()
 {
     return GetForegroundWindow() == g_hWnd;
@@ -244,5 +271,6 @@ void CPatches::Init()
     GameCorePatches();
     InputPatches();
     CrashfixHooks();
+    LimitPatches();
     MenuPatches();
 }

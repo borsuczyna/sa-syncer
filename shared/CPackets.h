@@ -103,8 +103,25 @@ public:
 		int playerId;
 	};
 
+	struct CPlayerControls
+	{
+		short LeftStickX;
+		short LeftStickY;
+		short RightShoulder1;
+		short m_bPedWalk;
+		short ButtonCircle;
+		short ButtonCross;
+		short ButtonSquare;
+		short ButtonTriangle;
+	};
+
 	struct PlayerUpdateData {
 		CVector3 m_vCurrentPosition;
+		CVector3 m_vMoveSpeed;
+		float m_fCameraOrientation;
+		float m_fAimingRotation;
+
+		CPlayerControls m_controls;
 	};
 
 	struct PlayerUpdatePacket : public Packet

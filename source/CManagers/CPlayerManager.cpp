@@ -27,7 +27,11 @@ CPlayerPed* CPlayerManager::CreatePlayerPed(int id, int model, CVector3 position
 	CStreaming::RequestModel(model, eStreamingFlags::PRIORITY_REQUEST | eStreamingFlags::GAME_REQUIRED);
 	CStreaming::LoadAllRequestedModels(true);
 
-	CPlayerPed* player = new CPlayerPed(id + 1, 0);
+	CPlayerInfo* info = &CWorld::Players[id + 2];
+	CPlayerPed* player = new CPlayerPed(id + 2, 0);
+
+	info->m_pPed = player;
+	info->m_nPlayerState = ePlayerState::PLAYERSTATE_PLAYING;
 
 	player->m_nPedType = ePedType::PED_TYPE_PLAYER1;
 	CWorld::Add(player);
@@ -44,4 +48,22 @@ void CPlayerManager::DeletePlayerPed(CPlayerPed* ped)
 
 	CWorld::Remove(ped);
 	delete ped;
+}
+
+void CPlayerManager::ProcessPlayers()
+{
+	for (auto player : m_pPlayers)
+	{
+		if (player == nullptr) continue;
+
+		player->Process();
+	}
+}
+
+void CPlayerManager::Init()
+{
+	Events::drawingEvent += []()
+	{
+		CPlayerManager::ProcessPlayers();
+	};
 }

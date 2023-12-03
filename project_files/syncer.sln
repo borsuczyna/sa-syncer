@@ -7,6 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syncer", "syncer.vcxproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{2B6912A8-C422-4FD1-B451-0845C9EF8DFF}"
 	ProjectSection(SolutionItems) = preProject
+		..\shared\CInterpolate.h = ..\shared\CInterpolate.h
 		..\shared\CPackets.h = ..\shared\CPackets.h
 		..\shared\CShared.h = ..\shared\CShared.h
 		..\shared\CVector3.h = ..\shared\CVector3.h
