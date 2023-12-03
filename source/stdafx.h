@@ -40,4 +40,5 @@ using namespace plugin;
 #include "CManagers/CPlayerManager.h"
 #include "CConsole/CConsole.h"
 #include "CCore/CCore.h"
+#include "CModelManager/CModelManager.h"
 #include "CDiscordRPC/CDiscordRPC.h"

@@ -27,6 +27,8 @@ public:
 	void SetVelocity(CVector3 velocity);
 	bool IsDucked() const;
 	void SetDucked(bool isDucked);
+	void GiveWeapon(eWeaponType weaponType, unsigned int ammo, bool armed);
+	void SetWeapon(eWeaponType weaponType, unsigned int ammoInClip, unsigned int ammoTotal);
 
 	const char* GetName() const;
 	void SetName(const char* name);

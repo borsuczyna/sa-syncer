@@ -93,6 +93,41 @@ void CPlayer::SetDucked(bool isDucked)
 	duckToggle.ProcessPed(ped);
 }
 
+void CPlayer::GiveWeapon(eWeaponType weaponType, unsigned int ammo, bool armed)
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return;
+
+	CWeaponInfo* info = CWeaponInfo::GetWeaponInfo(weaponType, 1);
+
+	bool requestModelSuccess = true;
+	if (info->m_nModelId1 > 0) requestModelSuccess = CModelManager::LoadModel(info->m_nModelId1);
+	if (info->m_nModelId2 > 0 && requestModelSuccess) requestModelSuccess = CModelManager::LoadModel(info->m_nModelId2);
+	if (!requestModelSuccess) return;
+
+	ped->GiveWeapon(weaponType, ammo, false);
+	ped->SetCurrentWeapon(weaponType);
+}
+
+void CPlayer::SetWeapon(eWeaponType weaponType, unsigned int ammoInClip, unsigned int ammoTotal)
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return;
+
+	if (ped->m_aWeapons[ped->m_nActiveWeaponSlot].m_eWeaponType != weaponType)
+	{
+		if (weaponType != 0) this->GiveWeapon(weaponType, 1000, true);
+		else ped->SetCurrentWeapon(weaponType);
+	}
+
+	CWeapon* weapon = &ped->m_aWeapons[ped->m_nActiveWeaponSlot];
+	if (weapon->m_eWeaponType == weaponType && weapon->m_nAmmoInClip > 0)
+	{
+		weapon->m_nAmmoInClip = ammoInClip;
+		weapon->m_nTotalAmmo = ammoTotal;
+	}
+}
+
 void CPlayer::StreamIn(PlayerUpdateData data, bool isDucked)
 {
 	if (this->m_bIsStreamedIn) return;
@@ -146,6 +181,8 @@ CPackets::PlayerUpdatePacket CPlayer::BuildUpdatePacket()
 		state.ButtonTriangle,
 	};
 
+	CWeapon activeWeapon = ped->m_aWeapons[ped->m_nActiveWeaponSlot];
+
 	CPackets::PlayerUpdatePacket packet(this->m_iID);
 	PlayerUpdateData data{
 		this->GetPosition(),					// m_vCurrentPosition
@@ -154,6 +191,10 @@ CPackets::PlayerUpdatePacket CPlayer::BuildUpdatePacket()
 		ped->m_fAimingRotation,					// m_fAimingRotation
 		ped->m_pPlayerData->m_fMoveBlendRatio,	// m_fMoveBlendRatio
 		ped->m_nMoveState,						// m_iMoveState
+
+		activeWeapon.m_eWeaponType,				// m_iCurrentWeapon
+		activeWeapon.m_nAmmoInClip,				// m_iAmmoInClip
+		activeWeapon.m_nTotalAmmo,				// m_iAmmoTotal
 
 		controls								// m_controls
 	};
@@ -204,6 +245,8 @@ void CPlayer::Update(PlayerUpdateData data)
 	this->m_updateData = data;
 	this->m_bUpdateDataAvailable = true;
 	this->m_lastUpdateTick = GetTickCount64();
+
+	this->SetWeapon((eWeaponType)data.m_iCurrentWeapon, data.m_iAmmoInClip, data.m_iAmmoTotal);
 }
 
 void CPlayer::Process()

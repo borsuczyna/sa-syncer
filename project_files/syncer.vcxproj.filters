@@ -38,6 +38,9 @@
     <ClCompile Include="..\source\CDiscordRPC\CDiscordRPC.cpp">
       <Filter>CDiscordRPC</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\CModelManager\CModelManager.cpp">
+      <Filter>CModelManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CHooks">
@@ -78,6 +81,9 @@
     </Filter>
     <Filter Include="CEntities\CPlayer">
       <UniqueIdentifier>{f9c1373b-84e9-4b6e-b9ef-d65ab7cdb2db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CModelManager">
+      <UniqueIdentifier>{76468a2e-bdf9-472c-8531-356a32a7baee}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +129,9 @@
     </ClInclude>
     <ClInclude Include="..\source\CDiscordRPC\include\discord_rpc.h">
       <Filter>CDiscordRPC\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CModelManager\CModelManager.h">
+      <Filter>CModelManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

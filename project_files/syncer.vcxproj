@@ -114,6 +114,7 @@
     <ClCompile Include="..\source\CHooks\CHooks.cpp" />
     <ClCompile Include="..\source\CHooks\CPatches.cpp" />
     <ClCompile Include="..\source\CManagers\CPlayerManager.cpp" />
+    <ClCompile Include="..\source\CModelManager\CModelManager.cpp" />
     <ClCompile Include="..\source\CNetworking\CNetworking.cpp" />
     <ClCompile Include="..\source\CPacketManagers\CPlayerPackets.cpp" />
     <ClCompile Include="..\source\CTimers\CTimers.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="..\source\CHooks\CHooks.h" />
     <ClInclude Include="..\source\CHooks\CPatches.h" />
     <ClInclude Include="..\source\CManagers\CPlayerManager.h" />
+    <ClInclude Include="..\source\CModelManager\CModelManager.h" />
     <ClInclude Include="..\source\CNetworking\CNetworking.h" />
     <ClInclude Include="..\source\CPacketManagers\CPlayerPackets.h" />
     <ClInclude Include="..\source\CTimers\CTimers.h" />

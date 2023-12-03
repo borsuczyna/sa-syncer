@@ -31,6 +31,10 @@ struct PlayerUpdateData {
 	float m_fMoveBlendRatio;
 	int m_iMoveState;
 
+	unsigned int m_iCurrentWeapon;
+	unsigned int m_iAmmoInClip;
+	unsigned int m_iAmmoTotal;
+
 	CPlayerControls m_controls;
 };
 

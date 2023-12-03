@@ -51,6 +51,7 @@ bool Hooked_PSelectDevice()
     RwEngineGetVideoModeInfo(&g_videoMode, videoMode);
     g_hWnd = RsGlobal.ps->window;
 
+    SetWindowTextA(g_hWnd, "SA Syncer");
     ApplyWindowMode();
 
     RwD3D9EngineSetMultiSamplingLevels(*reinterpret_cast<RwUInt32*>(0xBA6810));
