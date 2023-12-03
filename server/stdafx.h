@@ -9,6 +9,7 @@
 #include <enet/enet.h>
 
 #include "../shared/CPackets.h"
+#include "../shared/CMassSerializer.h"
 
 #include "CConsole/CConsole.h"
 #include "CEntities/CPlayer/CPlayer.h"

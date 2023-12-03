@@ -6,11 +6,15 @@ bool CNetworking::m_bIsConnected = false;
 ENetHost* CNetworking::m_pClient = nullptr;
 std::vector<CPacketListener*> CNetworking::m_listeners = std::vector<CPacketListener*>();
 
-void CNetworking::SendPacket(void* packet, int size)
+void CNetworking::SendPacket(CPackets::MessageId messageId, void* packet, int size)
 {
 	if (!CNetworking::m_bIsConnected) return;
 
-	ENetPacket* enetPacket = enet_packet_create(packet, size, ENET_PACKET_FLAG_RELIABLE);
+	char* buffer = new char[size + sizeof(CPackets::MessageId)];
+	memcpy(buffer, &messageId, sizeof(CPackets::MessageId));
+	memcpy(buffer + sizeof(CPackets::MessageId), packet, size);
+
+	ENetPacket* enetPacket = enet_packet_create(buffer, size + sizeof(CPackets::MessageId), ENET_PACKET_FLAG_RELIABLE);
 	enet_host_broadcast(m_pClient, 0, enetPacket);
 }
 
@@ -56,7 +60,7 @@ void CNetworking::InitAsync(int port)
 	CCore::m_ulServerConnectTime = time(0);
 	CPlayer* localPlayer = CPlayerManager::GetLocalPlayer();
 	CPackets::HandshakePacket packet = CPackets::HandshakePacket(localPlayer->GetName(), localPlayer->GetPosition());
-	SendPacket(&packet, sizeof(CPackets::HandshakePacket));
+	SendPacket(CPackets::MessageId::HANDSHAKE, &packet, sizeof(CPackets::HandshakePacket));
 
 	while (1)
 	{
@@ -86,14 +90,14 @@ void CNetworking::Connect(int port)
 	t.detach();
 }
 
-void CNetworking::RegisterListener(void(*callback)(void*, int)) {
-	CPacketListener* listener = new CPacketListener(callback);
+void CNetworking::RegisterListener(CPackets::MessageId messageId, void(*callback)(void*, int)) {
+	CPacketListener* listener = new CPacketListener(messageId, callback);
 	m_listeners.push_back(listener);
 }
 
-void CNetworking::UnregisterListener(void(*callback)(void*, int)) {
+void CNetworking::UnregisterListener(CPackets::MessageId messageId, void(*callback)(void*, int)) {
 	for (size_t i = 0; i < m_listeners.size(); i++) {
-		if (m_listeners[i]->m_callback == callback) {
+		if (m_listeners[i]->m_callback == callback && m_listeners[i]->m_messageId == messageId) {
 			m_listeners.erase(m_listeners.begin() + i);
 			return;
 		}
@@ -102,8 +106,15 @@ void CNetworking::UnregisterListener(void(*callback)(void*, int)) {
 
 void CNetworking::HandlePacket(void* packet, int size)
 {
-	for (size_t i = 0; i < m_listeners.size(); i++)
-	{
-		m_listeners[i]->m_callback(packet, size);
+	CPackets::MessageId messageId;
+	memcpy(&messageId, packet, sizeof(CPackets::MessageId));
+
+	char* buffer = new char[size - sizeof(CPackets::MessageId)];
+	memcpy(buffer, (char*)packet + sizeof(CPackets::MessageId), size - sizeof(CPackets::MessageId));
+
+	for (size_t i = 0; i < m_listeners.size(); i++) {
+		if (m_listeners[i]->m_messageId == messageId) {
+			m_listeners[i]->m_callback(buffer, size - sizeof(CPackets::MessageId));
+		}
 	}
 }

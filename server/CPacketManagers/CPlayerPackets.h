@@ -16,7 +16,7 @@ public:
     static void SendPlayerStreamOut(CPlayer* player, CPlayer* target);
     static void UpdateStreaming(CPlayer* player);
 
-    static CPackets::MassivePlayerUpdatePacket BuildMassivePacketForPlayer(CPlayer* player);
+    static char* BuildMassivePacketForPlayer(CPlayer* player, size_t& size);
     static void SendPlayersUpdate();
 
     static void Init();

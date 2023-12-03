@@ -53,7 +53,6 @@ std::vector<CPlayer*> CPlayer::GetStreamedFor()
 CPackets::PlayerUpdatePacket CPlayer::BuildUpdatePacket()
 {
 	CPackets::PlayerUpdatePacket packet;
-	packet.id = CPackets::MessageId::PLAYER_UPDATE;
 	packet.playerId = this->m_iID;
 	packet.data = this->m_updateData;
 

@@ -66,16 +66,10 @@ public:
 		MASSIVE_PLAYER_UPDATE = 8,
 	};
 
-    struct Packet
-	{
-		MessageId id;
-	};
-
-    struct HandshakePacket : public Packet
+    struct HandshakePacket
 	{
 		HandshakePacket(const char* nickname, CVector3 position)
 		{
-			id = HANDSHAKE;
 			strcpy_s(this->nickname, nickname);
 			strcpy_s(this->secret, SERVER_SECRET);
 			this->position = position;
@@ -86,11 +80,10 @@ public:
 		CVector3 position = {};
 	};
 
-	struct HandshakeResponsePacket : public Packet
+	struct HandshakeResponsePacket
 	{
 		HandshakeResponsePacket(int playerId, int tickRate, const char* serverName, int maxPlayers)
 		{
-			id = HANDSHAKE_RESPONSE;
 			this->playerId = playerId;
 			this->serverInfo.tickRate = tickRate;
 			strcpy_s(this->serverInfo.name, serverName);
@@ -101,11 +94,10 @@ public:
 		ServerInfo serverInfo = {};
 	};
 
-	struct PlayerConnectedPacket : public Packet
+	struct PlayerConnectedPacket
 	{
 		PlayerConnectedPacket(int playerId, const char* nickname)
 		{
-			id = PLAYER_CONNECTED;
 			this->playerId = playerId;
 			strcpy_s(this->nickname, nickname);
 		}
@@ -114,22 +106,20 @@ public:
 		char nickname[MAX_NAME] = {};
 	};
 
-	struct PlayerDisconnectedPacket : public Packet
+	struct PlayerDisconnectedPacket
 	{
 		PlayerDisconnectedPacket(int playerId)
 		{
-			id = PLAYER_DISCONNECTED;
 			this->playerId = playerId;
 		}
 
 		int playerId;
 	};
 
-	struct PlayerStreamInPacket : public Packet
+	struct PlayerStreamInPacket
 	{
 		PlayerStreamInPacket(int playerId)
 		{
-			id = PLAYER_STREAM_IN;
 			this->playerId = playerId;
 		}
 
@@ -138,24 +128,21 @@ public:
 		bool isDucked = false;
 	};
 
-	struct PlayerStreamOutPacket : public Packet
+	struct PlayerStreamOutPacket
 	{
 		PlayerStreamOutPacket(int playerId)
 		{
-			id = PLAYER_STREAM_OUT;
 			this->playerId = playerId;
 		}
 
 		int playerId;
 	};
 
-	struct PlayerUpdatePacket : public Packet
+	struct PlayerUpdatePacket
 	{
 		PlayerUpdatePacket() = default;
-
 		PlayerUpdatePacket(int playerId)
 		{
-			id = PLAYER_UPDATE;
 			this->playerId = playerId;
 		}
 
@@ -163,11 +150,10 @@ public:
 		PlayerUpdateData data = {};
 	};
 
-	struct PlayerTaskPacket : public Packet
+	struct PlayerTaskPacket
 	{
 		PlayerTaskPacket(int taskType, TaskData taskData = {})
 		{
-			id = PLAYER_TASK;
 			this->taskType = taskType;
 			this->taskData = taskData;
 		}
@@ -177,11 +163,10 @@ public:
 		TaskData taskData;
 	};
 
-	struct MassivePlayerUpdatePacket : public Packet
+	struct MassivePlayerUpdatePacket
 	{
 		MassivePlayerUpdatePacket(int playersCount)
 		{
-			id = MASSIVE_PLAYER_UPDATE;
 			this->playerCount = playersCount;
 		}
 

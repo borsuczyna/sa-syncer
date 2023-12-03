@@ -3,10 +3,12 @@
 class CPacketListener
 {
 public:
+	CPackets::MessageId m_messageId;
 	void(*m_callback)(ENetPeer*, void*, int);
 
-	CPacketListener(void(*callback)(ENetPeer*, void*, int))
+	CPacketListener(CPackets::MessageId messageId, void(*callback)(ENetPeer*, void*, int))
 	{
+		m_messageId = messageId;
 		m_callback = callback;
 	}
 };
@@ -18,15 +20,15 @@ class CNetworking
 
 public:
 	static void Init(int port);
-	static void SendPacket(ENetPeer* peer, void* packet, int size);
-	static void SendPacket(CPlayer* player, void* packet, int size);
-	static void BroadcastPacket(void* packet, int size);
-	static void BroadcastPacket(ENetPeer* exclude, void* packet, int size);
-	static void BroadcastPacket(CPlayer* exclude, void* packet, int size);
+	static void SendPacket(CPackets::MessageId messageId, ENetPeer* peer, void* packet, int size);
+	static void SendPacket(CPackets::MessageId messageId, CPlayer* player, void* packet, int size);
+	static void BroadcastPacket(CPackets::MessageId messageId, void* packet, int size);
+	static void BroadcastPacket(CPackets::MessageId messageId, ENetPeer* exclude, void* packet, int size);
+	static void BroadcastPacket(CPackets::MessageId messageId, CPlayer* exclude, void* packet, int size);
 	static void ClientDisconnect(ENetPeer* peer);
 
-	static void RegisterListener(void(*callback)(ENetPeer*, void*, int));
-	static void UnregisterListener(void(*callback)(ENetPeer*, void*, int));
+	static void RegisterListener(CPackets::MessageId messageId, void(*callback)(ENetPeer*, void*, int));
+	static void UnregisterListener(CPackets::MessageId messageId, void(*callback)(ENetPeer*, void*, int));
 
 	static void HandlePacket(ENetPeer* peer, void* packet, int size);
 

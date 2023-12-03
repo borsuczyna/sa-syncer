@@ -2,9 +2,7 @@
 
 void CPlayerPackets::HandshakeResponsePacket(void* p, int size)
 {
-	if (size != sizeof(CPackets::HandshakeResponsePacket)) return;
 	CPackets::HandshakeResponsePacket* packet = (CPackets::HandshakeResponsePacket*)p;
-	if (packet->id != CPackets::MessageId::HANDSHAKE_RESPONSE) return;
 
 	CCore::m_serverInfo = packet->serverInfo;
 	CConsole::Print("Connected to the server %s! My ID is %d", packet->serverInfo.name, packet->playerId);
@@ -15,63 +13,49 @@ void CPlayerPackets::HandshakeResponsePacket(void* p, int size)
 
 void CPlayerPackets::PlayerConnectedPacket(void* p, int size)
 {
-	if (size != sizeof(CPackets::PlayerConnectedPacket)) return;
 	CPackets::PlayerConnectedPacket* packet = (CPackets::PlayerConnectedPacket*)p;
-	if (packet->id != CPackets::MessageId::PLAYER_CONNECTED) return;
-
-	CConsole::Print("%s (%d) connected to the server!", packet->nickname, packet->playerId);
 
 	CPlayer* player = new CPlayer(packet->playerId, packet->nickname);
 	CPlayerManager::AddPlayer(player);
+
+	CConsole::Print("%s (%d) connected to the server!", packet->nickname, packet->playerId);
 }
 
 void CPlayerPackets::PlayerDisconnectedPacket(void* p, int size)
 {
-	if (size != sizeof(CPackets::PlayerDisconnectedPacket)) return;
 	CPackets::PlayerDisconnectedPacket* packet = (CPackets::PlayerDisconnectedPacket*)p;
-	if (packet->id != CPackets::MessageId::PLAYER_DISCONNECTED) return;
-
 	CPlayer* player = CPlayerManager::GetPlayer(packet->playerId);
 	if (player == nullptr) return;
 
-	CConsole::Print("%s (%d) disconnected from the server!", player->GetName(), player->m_iID);
-	
 	CPlayerManager::RemovePlayer(player);
 	delete player;
+	
+	CConsole::Print("%s (%d) disconnected from the server!", player->GetName(), player->m_iID);
 }
 
 void CPlayerPackets::PlayerStreamInPacket(void* p, int size)
 {
-	if (size != sizeof(CPackets::PlayerStreamInPacket)) return;
 	CPackets::PlayerStreamInPacket* packet = (CPackets::PlayerStreamInPacket*)p;
-	if (packet->id != CPackets::MessageId::PLAYER_STREAM_IN) return;
-
 	CPlayer* player = CPlayerManager::GetPlayer(packet->playerId);
 	if (player == nullptr) return;
 
-	CConsole::Print("%s (%d) streamed in!", player->GetName(), player->m_iID);
 	player->StreamIn(packet->data, packet->isDucked);
+	CConsole::Print("%s (%d) streamed in!", player->GetName(), player->m_iID);
 }
 
 void CPlayerPackets::PlayerStreamOutPacket(void* p, int size)
 {
-	if (size != sizeof(CPackets::PlayerStreamOutPacket)) return;
 	CPackets::PlayerStreamOutPacket* packet = (CPackets::PlayerStreamOutPacket*)p;
-	if (packet->id != CPackets::MessageId::PLAYER_STREAM_OUT) return;
-
 	CPlayer* player = CPlayerManager::GetPlayer(packet->playerId);
 	if (player == nullptr) return;
 
-	CConsole::Print("%s (%d) streamed out!", player->GetName(), player->m_iID);
 	player->StreamOut();
+	CConsole::Print("%s (%d) streamed out!", player->GetName(), player->m_iID);
 }
 
 void CPlayerPackets::PlayerTaskPacket(void* p, int size)
 {
-	if (size != sizeof(CPackets::PlayerTaskPacket)) return;
 	CPackets::PlayerTaskPacket* packet = (CPackets::PlayerTaskPacket*)p;
-	if (packet->id != CPackets::MessageId::PLAYER_TASK) return;
-
 	CPlayer* player = CPlayerManager::GetPlayer(packet->playerId);
 	if (player == NULL) return;
 
@@ -80,39 +64,38 @@ void CPlayerPackets::PlayerTaskPacket(void* p, int size)
 
 void CPlayerPackets::MassivePlayerUpdatePacket(void* p, int size)
 {
-	if (size != sizeof(CPackets::MassivePlayerUpdatePacket)) return;
-	CPackets::MassivePlayerUpdatePacket* packet = (CPackets::MassivePlayerUpdatePacket*)p;
-	if (packet->id != CPackets::MessageId::MASSIVE_PLAYER_UPDATE) return;
+	char* buffer = static_cast<char*>(p);
 
-	for (size_t i = 0; i < packet->playerCount; i++)
+	size_t count;
+	std::vector<CPackets::PlayerUpdatePacket> data = CMassSerializer::DeserializeMessage<CPackets::PlayerUpdatePacket>(buffer, count);
+
+	for (auto item : data)
 	{
-		CPlayer* player = CPlayerManager::GetPlayer(packet->players[i].playerId);
+		CPlayer* player = CPlayerManager::GetPlayer(item.playerId);
 		if (player == nullptr) continue;
 
-		player->Update(packet->players[i].data);
+		player->Update(item.data);
 	}
 }
 
 void CPlayerPackets::SendPlayerTaskPacket(int task, TaskData data)
 {
 	if (!CNetworking::m_bIsConnected) return;
-
 	CPlayer* player = CPlayerManager::GetLocalPlayer();
 	if (player == NULL) return;
 
 	CPackets::PlayerTaskPacket packet = CPackets::PlayerTaskPacket(task, data);
-	CNetworking::SendPacket(&packet, sizeof(CPackets::PlayerTaskPacket));
+	CNetworking::SendPacket(CPackets::MessageId::PLAYER_TASK, &packet, sizeof(CPackets::PlayerTaskPacket));
 }
 
 void CPlayerPackets::SendPlayerUpdatePacket()
 {
 	if (!CNetworking::m_bIsConnected) return;
-
 	CPlayer* player = CPlayerManager::GetLocalPlayer();
 	if (player == nullptr) return;
 
 	CPackets::PlayerUpdatePacket packet = player->BuildUpdatePacket();
-	CNetworking::SendPacket(&packet, sizeof(CPackets::PlayerUpdatePacket));
+	CNetworking::SendPacket(CPackets::MessageId::PLAYER_UPDATE, &packet, sizeof(CPackets::PlayerUpdatePacket));
 }
 
 void CPlayerPackets::InitPlayerUpdateTimer()
@@ -128,11 +111,11 @@ void CPlayerPackets::DestroyPlayerUpdateTimer()
 
 void CPlayerPackets::Init()
 {
-	CNetworking::RegisterListener(CPlayerPackets::HandshakeResponsePacket);
-	CNetworking::RegisterListener(CPlayerPackets::PlayerConnectedPacket);
-	CNetworking::RegisterListener(CPlayerPackets::PlayerDisconnectedPacket);
-	CNetworking::RegisterListener(CPlayerPackets::PlayerStreamInPacket);
-	CNetworking::RegisterListener(CPlayerPackets::PlayerStreamOutPacket);
-	CNetworking::RegisterListener(CPlayerPackets::PlayerTaskPacket);
-	CNetworking::RegisterListener(CPlayerPackets::MassivePlayerUpdatePacket);
+	CNetworking::RegisterListener(CPackets::MessageId::HANDSHAKE_RESPONSE, CPlayerPackets::HandshakeResponsePacket);
+	CNetworking::RegisterListener(CPackets::MessageId::PLAYER_CONNECTED, CPlayerPackets::PlayerConnectedPacket);
+	CNetworking::RegisterListener(CPackets::MessageId::PLAYER_DISCONNECTED, CPlayerPackets::PlayerDisconnectedPacket);
+	CNetworking::RegisterListener(CPackets::MessageId::PLAYER_STREAM_IN, CPlayerPackets::PlayerStreamInPacket);
+	CNetworking::RegisterListener(CPackets::MessageId::PLAYER_STREAM_OUT, CPlayerPackets::PlayerStreamOutPacket);
+	CNetworking::RegisterListener(CPackets::MessageId::PLAYER_TASK, CPlayerPackets::PlayerTaskPacket);
+	CNetworking::RegisterListener(CPackets::MessageId::MASSIVE_PLAYER_UPDATE, CPlayerPackets::MassivePlayerUpdatePacket);
 }

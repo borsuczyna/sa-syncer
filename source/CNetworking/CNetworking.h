@@ -3,10 +3,12 @@
 class CPacketListener
 {
 public:
+	CPackets::MessageId m_messageId;
 	void(*m_callback)(void*, int);
 
-	CPacketListener(void(*callback)(void*, int))
+	CPacketListener(CPackets::MessageId messageId, void(*callback)(void*, int))
 	{
+		m_messageId = messageId;
 		m_callback = callback;
 	}
 };
@@ -22,10 +24,10 @@ public:
 
 	static void Connect(int port);
 	static void InitAsync(int port);
-	static void SendPacket(void* packet, int size);
+	static void SendPacket(CPackets::MessageId messageId, void* packet, int size);
 
-	static void RegisterListener(void(*callback)(void*, int));
-	static void UnregisterListener(void(*callback)(void*, int));
+	static void RegisterListener(CPackets::MessageId messageId, void(*callback)(void*, int));
+	static void UnregisterListener(CPackets::MessageId messageId, void(*callback)(void*, int));
 
 	static void HandlePacket(void* packet, int size);
 };

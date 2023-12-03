@@ -27,6 +27,7 @@ using namespace plugin;
 // shared
 #include "../shared/CPackets.h"
 #include "../shared/CInterpolate.h"
+#include "../shared/CMassSerializer.h"
 
 // syncer
 #include "CTimers/CTimers.h"

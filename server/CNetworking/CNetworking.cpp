@@ -3,40 +3,44 @@
 ENetHost* CNetworking::m_pServer = nullptr;
 std::vector<CPacketListener*> CNetworking::m_listeners = std::vector<CPacketListener*>();
 
-void CNetworking::SendPacket(ENetPeer* peer, void* packet, int size)
+void CNetworking::SendPacket(CPackets::MessageId messageId, ENetPeer* peer, void* packet, int size)
 {
-	ENetPacket* enetPacket = enet_packet_create(packet, size, ENET_PACKET_FLAG_RELIABLE);
-	enet_peer_send(peer, 0, enetPacket);
+    char* buffer = new char[size + sizeof(CPackets::MessageId)];
+    memcpy(buffer, &messageId, sizeof(CPackets::MessageId));
+    memcpy(buffer + sizeof(CPackets::MessageId), packet, size);
+
+    ENetPacket* enetPacket = enet_packet_create(buffer, size + sizeof(CPackets::MessageId), ENET_PACKET_FLAG_RELIABLE);
+    enet_peer_send(peer, 0, enetPacket);
 }
 
-void CNetworking::SendPacket(CPlayer* player, void* packet, int size)
+void CNetworking::SendPacket(CPackets::MessageId messageId, CPlayer* player, void* packet, int size)
 {
-	CNetworking::SendPacket(player->m_pPeer, packet, size);
+	CNetworking::SendPacket(messageId, player->m_pPeer, packet, size);
 }
 
-void CNetworking::BroadcastPacket(void* packet, int size)
+void CNetworking::BroadcastPacket(CPackets::MessageId messageId, void* packet, int size)
 {
     auto players = CPlayerManager::GetPlayers();
     for (auto player : players)
     {
-        CNetworking::SendPacket(player->m_pPeer, packet, size);
+        CNetworking::SendPacket(messageId, player->m_pPeer, packet, size);
     }
 }
 
-void CNetworking::BroadcastPacket(ENetPeer* exclude, void* packet, int size)
+void CNetworking::BroadcastPacket(CPackets::MessageId messageId, ENetPeer* exclude, void* packet, int size)
 {
     auto players = CPlayerManager::GetPlayers();
     for (auto player : players)
     {
         if (player->m_pPeer == exclude) continue;
         
-        CNetworking::SendPacket(player->m_pPeer, packet, size);
+        CNetworking::SendPacket(messageId, player->m_pPeer, packet, size);
     }
 }
 
-void CNetworking::BroadcastPacket(CPlayer* exclude, void* packet, int size)
+void CNetworking::BroadcastPacket(CPackets::MessageId messageId, CPlayer* exclude, void* packet, int size)
 {
-	return CNetworking::BroadcastPacket(exclude->m_pPeer, packet, size);
+	return CNetworking::BroadcastPacket(messageId, exclude->m_pPeer, packet, size);
 }
 
 void CNetworking::ClientDisconnect(ENetPeer* peer)
@@ -102,15 +106,15 @@ void CNetworking::Init(int port)
     enet_deinitialize();
 }
 
-void CNetworking::RegisterListener(void(*callback)(ENetPeer*, void*, int))
+void CNetworking::RegisterListener(CPackets::MessageId messageId, void(*callback)(ENetPeer*, void*, int))
 {
-	CPacketListener* listener = new CPacketListener(callback);
+	CPacketListener* listener = new CPacketListener(messageId, callback);
 	m_listeners.push_back(listener);
 }
 
-void CNetworking::UnregisterListener(void(*callback)(ENetPeer*, void*, int)) {
+void CNetworking::UnregisterListener(CPackets::MessageId messageId, void(*callback)(ENetPeer*, void*, int)) {
     for (size_t i = 0; i < m_listeners.size(); i++) {
-        if (m_listeners[i]->m_callback == callback) {
+        if (m_listeners[i]->m_callback == callback && m_listeners[i]->m_messageId == messageId) {
             m_listeners.erase(m_listeners.begin() + i);
             return;
         }
@@ -119,9 +123,16 @@ void CNetworking::UnregisterListener(void(*callback)(ENetPeer*, void*, int)) {
 
 void CNetworking::HandlePacket(ENetPeer* peer, void* packet, int size)
 {
-	for (size_t i = 0; i < m_listeners.size(); i++)
-	{
-	    m_listeners[i]->m_callback(peer, packet, size);
+    CPackets::MessageId messageId;
+    memcpy(&messageId, packet, sizeof(CPackets::MessageId));
+
+    char* buffer = new char[size - sizeof(CPackets::MessageId)];
+    memcpy(buffer, (char*)packet + sizeof(CPackets::MessageId), size - sizeof(CPackets::MessageId));
+
+    for (size_t i = 0; i < m_listeners.size(); i++) {
+        if (m_listeners[i]->m_messageId == messageId) {
+			m_listeners[i]->m_callback(peer, buffer, size - sizeof(CPackets::MessageId));
+		}
 	}
 }
 
