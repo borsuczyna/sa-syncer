@@ -1,7 +1,10 @@
 #include "../stdafx.h"
 
 char CCore::m_szNickname[MAX_NAME];
+CPackets::ServerInfo CCore::m_serverInfo;
 int CCore::m_iTickRate = TICK_RATE;
+time_t CCore::m_ulGameLaunchTime = time(0);
+time_t CCore::m_ulServerConnectTime = time(0);
 
 void HandleServerConnecting()
 {
@@ -33,7 +36,8 @@ void CCore::SetTickRate(int rate)
 
 void CCore::GameLaunch()
 {
-    SetNickname(CNickGenerator::GetRandomNickname());
+    //SetNickname(CNickGenerator::GetRandomNickname());
+    SetNickname("borsuczyna");
 
     CConsole::Init();
     CPatches::Init();
@@ -47,6 +51,9 @@ void CCore::GameLaunch()
 
     // Managers
     CPlayerManager::Init();
+
+    // Discord RPC
+	CDiscordRPC::Init();
 
     Events::drawingEvent += []()
     {

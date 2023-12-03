@@ -21,8 +21,8 @@ bool CHooks::SetBranchPointer(uintptr_t currentAddress, uintptr_t src, injector:
 void PlayersPatches()
 {
     // Unlock pads count
-    patch::SetUChar(0x84E1FA + 1, MAX_SERVER_PLAYERS);
-    patch::SetUChar(0x856465 + 1, MAX_SERVER_PLAYERS);
+    patch::SetUChar(0x84E1FA + 1, MAX_SERVER_PLAYERS + 2); // we dont use player id 0 and 1
+    patch::SetUChar(0x856465 + 1, MAX_SERVER_PLAYERS + 2);
 
     CHooks::Patch_Funcs.push_back([](uint32_t Address) -> bool
     {
@@ -47,8 +47,8 @@ void PlayersPatches()
 	});
 
     // Unlock players count
-    patch::SetUChar(0x84E98A + 1, MAX_SERVER_PLAYERS);
-    patch::SetUChar(0x856505 + 1, MAX_SERVER_PLAYERS);
+    patch::SetUChar(0x84E98A + 1, MAX_SERVER_PLAYERS + 2);
+    patch::SetUChar(0x856505 + 1, MAX_SERVER_PLAYERS + 2);
 
     CWorld::Players = CPlayerManager::Players;
 

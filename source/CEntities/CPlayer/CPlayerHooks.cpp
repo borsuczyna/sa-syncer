@@ -3,7 +3,7 @@
 CPlayerInfo* __fastcall CPlayerHooks::GetPlayerInfoForThisPlayerPed(CPlayerPed* This)
 {
 	if (This == FindPlayerPed(0)) return &CWorld::Players[0];
-	for (int i = 0; i < MAX_SERVER_PLAYERS; i++)
+	for (int i = 0; i < MAX_SERVER_PLAYERS + 2; i++) // we don't use player id 0 and 1
 	{
 		if (This == CWorld::Players[i].m_pPed) return &CWorld::Players[i];
 	}
@@ -27,7 +27,7 @@ CVehicle* __cdecl CPlayerHooks::FindPlayerVehicleHook(int playerid, bool bInclud
 int CPlayerHooks::GetPlayerWorldId(CPlayerPed* This)
 {
 	if (This == FindPlayerPed(0)) return 0;
-	for (int i = 0; i < MAX_SERVER_PLAYERS; i++)
+	for (int i = 0; i < MAX_SERVER_PLAYERS + 2; i++) // we don't use player id 0 and 1
 	{
 		if (This == CWorld::Players[i].m_pPed) return i;
 	}

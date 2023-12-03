@@ -238,7 +238,7 @@ void LimitPatches()
     patch::SetUChar(0x551140, 0xFF);
 
     //Inc ped pool pool
-    patch::SetUChar(0x550FF2, 1000);
+    patch::SetUChar(0x550FF2, (unsigned char)1000);
 
     //Inc intelligence pool
     patch::SetUChar(0x551283, 210);

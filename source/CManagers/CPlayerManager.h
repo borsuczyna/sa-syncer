@@ -5,8 +5,8 @@ class CPlayerManager
 	static CPlayer* m_pLocalPlayer;
 
 public:
-	static CPlayerInfo Players[MAX_SERVER_PLAYERS];
-	static CPad Pads[MAX_SERVER_PLAYERS];
+	static CPlayerInfo Players[MAX_SERVER_PLAYERS + 2];
+	static CPad Pads[MAX_SERVER_PLAYERS + 2];
 
 	static std::vector<CPlayer*> m_pPlayers;
 

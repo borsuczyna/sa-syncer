@@ -1,9 +1,16 @@
+// includes
 #include <enet/enet.h>
 #include <vector>
 #include <thread>
 #include <ctime>
 #include "Windows.h"
 
+// discord rpc
+#include "CDiscordRPC/include/discord_register.h"
+#include "CDiscordRPC/include/discord_rpc.h"
+#pragma comment(lib, "discord-rpc.lib")
+
+// plugin sdk
 #include "plugin.h"
 #include "CPlayerInfo.h"
 #include "CPad.h"
@@ -11,12 +18,15 @@
 #include "CWorld.h"
 #include "CStreaming.h"
 #include "CCamera.h"
+#include "CTheZones.h"
 
 using namespace plugin;
 
+// shared
 #include "../shared/CPackets.h"
 #include "../shared/CInterpolate.h"
 
+// syncer
 #include "CTimers/CTimers.h"
 #include "CUtils/CNickGenerator.h"
 #include "CHooks/CHooks.h"
@@ -28,3 +38,4 @@ using namespace plugin;
 #include "CManagers/CPlayerManager.h"
 #include "CConsole/CConsole.h"
 #include "CCore/CCore.h"
+#include "CDiscordRPC/CDiscordRPC.h"

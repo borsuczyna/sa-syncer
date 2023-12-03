@@ -53,6 +53,7 @@ void CNetworking::InitAsync(int port)
 
 	CNetworking::m_bIsConnecting = false;
 	CNetworking::m_bIsConnected = true;
+	CCore::m_ulServerConnectTime = time(0);
 	CPlayer* localPlayer = CPlayerManager::GetLocalPlayer();
 	CPackets::HandshakePacket packet = CPackets::HandshakePacket(localPlayer->GetName(), localPlayer->GetPosition());
 	SendPacket(&packet, sizeof(CPackets::HandshakePacket));

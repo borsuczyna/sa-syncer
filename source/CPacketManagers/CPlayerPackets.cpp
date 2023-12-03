@@ -6,10 +6,11 @@ void CPlayerPackets::HandshakeResponsePacket(void* p, int size)
 	CPackets::HandshakeResponsePacket* packet = (CPackets::HandshakeResponsePacket*)p;
 	if (packet->id != CPackets::MessageId::HANDSHAKE_RESPONSE) return;
 
-	CConsole::Print("Connected to the server! My ID is %d", packet->playerId);
+	CCore::m_serverInfo = packet->serverInfo;
+	CConsole::Print("Connected to the server %s! My ID is %d", packet->serverInfo.name, packet->playerId);
 	CPlayerManager::GetLocalPlayer()->m_iID = packet->playerId;
 
-	CCore::SetTickRate(packet->tickRate);
+	CCore::SetTickRate(packet->serverInfo.tickRate);
 }
 
 void CPlayerPackets::PlayerConnectedPacket(void* p, int size)

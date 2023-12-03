@@ -1,8 +1,8 @@
 #include "../stdafx.h"
 
 CPlayer* CPlayerManager::m_pLocalPlayer = nullptr;
-CPlayerInfo CPlayerManager::Players[MAX_SERVER_PLAYERS];
-CPad CPlayerManager::Pads[MAX_SERVER_PLAYERS];
+CPlayerInfo CPlayerManager::Players[MAX_SERVER_PLAYERS + 2];
+CPad CPlayerManager::Pads[MAX_SERVER_PLAYERS + 2];
 
 std::vector<CPlayer*> CPlayerManager::m_pPlayers;
 

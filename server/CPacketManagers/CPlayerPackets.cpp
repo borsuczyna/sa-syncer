@@ -38,7 +38,7 @@ void CPlayerPackets::HandshakePacket(ENetPeer* peer, void* p, int size)
 	newPlayer->SetPosition(packet->position);
 	CPlayerManager::AddPlayer(newPlayer);
 
-	CPackets::HandshakeResponsePacket response = CPackets::HandshakeResponsePacket(id, CCore::tickRate);
+	CPackets::HandshakeResponsePacket response = CPackets::HandshakeResponsePacket(id, CCore::tickRate, CCore::m_szServerName, CCore::maxPlayers);
 	CNetworking::SendPacket(newPlayer, &response, sizeof(CPackets::HandshakeResponsePacket));
 
 	CPlayerPackets::SendPlayerConnected(newPlayer);

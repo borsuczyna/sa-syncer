@@ -35,6 +35,9 @@
     <ClCompile Include="..\source\CTimers\CTimers.cpp">
       <Filter>CTimers</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\CDiscordRPC\CDiscordRPC.cpp">
+      <Filter>CDiscordRPC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CHooks">
@@ -66,6 +69,15 @@
     </Filter>
     <Filter Include="CTimers">
       <UniqueIdentifier>{edb1a819-a0a7-4c16-a79a-146b9aedf49d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CDiscordRPC">
+      <UniqueIdentifier>{a94da2c0-c99e-4c41-bede-2c4258e6ecdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CDiscordRPC\lib">
+      <UniqueIdentifier>{0a4303fd-313e-4731-86d0-1238e7c0997c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CDiscordRPC\include">
+      <UniqueIdentifier>{77ac3762-8b17-40c3-ab38-cf16feaeac08}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -103,5 +115,19 @@
     <ClInclude Include="..\source\CTimers\CTimers.h">
       <Filter>CTimers</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\CDiscordRPC\CDiscordRPC.h">
+      <Filter>CDiscordRPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CDiscordRPC\include\discord_register.h">
+      <Filter>CDiscordRPC\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CDiscordRPC\include\discord_rpc.h">
+      <Filter>CDiscordRPC\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\source\CDiscordRPC\lib\discord-rpc.lib">
+      <Filter>CDiscordRPC\lib</Filter>
+    </Library>
   </ItemGroup>
 </Project>

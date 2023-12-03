@@ -42,17 +42,26 @@ public:
 		CVector3 position = {};
 	};
 
+	struct ServerInfo
+	{
+		char name[MAX_SERVER_NAME] = {};
+		int tickRate;
+		int maxPlayers;
+	};
+
 	struct HandshakeResponsePacket : public Packet
 	{
-		HandshakeResponsePacket(int playerId, int tickRate)
+		HandshakeResponsePacket(int playerId, int tickRate, const char* serverName, int maxPlayers)
 		{
 			id = HANDSHAKE_RESPONSE;
 			this->playerId = playerId;
-			this->tickRate = tickRate;
+			this->serverInfo.tickRate = tickRate;
+			strcpy_s(this->serverInfo.name, serverName);
+			this->serverInfo.maxPlayers = maxPlayers;
 		}
 
 		int playerId;
-		int tickRate;
+		ServerInfo serverInfo = {};
 	};
 
 	struct PlayerConnectedPacket : public Packet

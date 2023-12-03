@@ -45,7 +45,7 @@
     <IntDir>..\output\obj\Release\</IntDir>
     <TargetName>syncerSA</TargetName>
     <TargetExt>.asi</TargetExt>
-    <LibraryPath>C:\enet;$(LibraryPath)</LibraryPath>
+    <LibraryPath>CDiscordRPC\lib\;C:\enet;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -108,6 +108,7 @@
   <ItemGroup>
     <ClCompile Include="..\source\CConsole\CConsole.cpp" />
     <ClCompile Include="..\source\CCore\CCore.cpp" />
+    <ClCompile Include="..\source\CDiscordRPC\CDiscordRPC.cpp" />
     <ClCompile Include="..\source\CEntities\CPlayer\CPlayer.cpp" />
     <ClCompile Include="..\source\CEntities\CPlayer\CPlayerHooks.cpp" />
     <ClCompile Include="..\source\CHooks\CHooks.cpp" />
@@ -122,6 +123,9 @@
   <ItemGroup>
     <ClInclude Include="..\source\CConsole\CConsole.h" />
     <ClInclude Include="..\source\CCore\CCore.h" />
+    <ClInclude Include="..\source\CDiscordRPC\CDiscordRPC.h" />
+    <ClInclude Include="..\source\CDiscordRPC\include\discord_register.h" />
+    <ClInclude Include="..\source\CDiscordRPC\include\discord_rpc.h" />
     <ClInclude Include="..\source\CEntities\CPlayer\CPlayer.h" />
     <ClInclude Include="..\source\CEntities\CPlayer\CPlayerHooks.h" />
     <ClInclude Include="..\source\CHooks\CHooks.h" />
@@ -132,6 +136,9 @@
     <ClInclude Include="..\source\CTimers\CTimers.h" />
     <ClInclude Include="..\source\CUtils\CNickGenerator.h" />
     <ClInclude Include="..\source\stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\source\CDiscordRPC\lib\discord-rpc.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
