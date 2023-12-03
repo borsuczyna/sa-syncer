@@ -8,6 +8,7 @@ public:
     static void AddPlayer(CPlayer* player);
     static void RemovePlayer(CPlayer* player);
     static void KickPlayer(CPlayer* player, const char* reason);
+    static void KickPlayer(ENetPeer* peer, const char* reason);
     static void PlayerDisconnected(CPlayer* player);
     
     static CPlayer* GetPlayer(const char* name);

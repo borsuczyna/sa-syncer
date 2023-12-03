@@ -50,7 +50,7 @@ void CPlayerPackets::PlayerStreamInPacket(void* p, int size)
 	if (player == nullptr) return;
 
 	CConsole::Print("%s (%d) streamed in!", player->GetName(), player->m_iID);
-	player->StreamIn(packet->position);
+	player->StreamIn(packet->data, packet->isDucked);
 }
 
 void CPlayerPackets::PlayerStreamOutPacket(void* p, int size)
@@ -66,6 +66,18 @@ void CPlayerPackets::PlayerStreamOutPacket(void* p, int size)
 	player->StreamOut();
 }
 
+void CPlayerPackets::PlayerTaskPacket(void* p, int size)
+{
+	if (size != sizeof(CPackets::PlayerTaskPacket)) return;
+	CPackets::PlayerTaskPacket* packet = (CPackets::PlayerTaskPacket*)p;
+	if (packet->id != CPackets::MessageId::PLAYER_TASK) return;
+
+	CPlayer* player = CPlayerManager::GetPlayer(packet->playerId);
+	if (player == NULL) return;
+
+	player->HandleTask(packet);
+}
+
 void CPlayerPackets::MassivePlayerUpdatePacket(void* p, int size)
 {
 	if (size != sizeof(CPackets::MassivePlayerUpdatePacket)) return;
@@ -77,8 +89,19 @@ void CPlayerPackets::MassivePlayerUpdatePacket(void* p, int size)
 		CPlayer* player = CPlayerManager::GetPlayer(packet->players[i].playerId);
 		if (player == nullptr) continue;
 
-		player->Update(packet->players[i]);
+		player->Update(packet->players[i].data);
 	}
+}
+
+void CPlayerPackets::SendPlayerTaskPacket(int task, TaskData data)
+{
+	if (!CNetworking::m_bIsConnected) return;
+
+	CPlayer* player = CPlayerManager::GetLocalPlayer();
+	if (player == NULL) return;
+
+	CPackets::PlayerTaskPacket packet = CPackets::PlayerTaskPacket(task, data);
+	CNetworking::SendPacket(&packet, sizeof(CPackets::PlayerTaskPacket));
 }
 
 void CPlayerPackets::SendPlayerUpdatePacket()
@@ -110,5 +133,6 @@ void CPlayerPackets::Init()
 	CNetworking::RegisterListener(CPlayerPackets::PlayerDisconnectedPacket);
 	CNetworking::RegisterListener(CPlayerPackets::PlayerStreamInPacket);
 	CNetworking::RegisterListener(CPlayerPackets::PlayerStreamOutPacket);
+	CNetworking::RegisterListener(CPlayerPackets::PlayerTaskPacket);
 	CNetworking::RegisterListener(CPlayerPackets::MassivePlayerUpdatePacket);
 }

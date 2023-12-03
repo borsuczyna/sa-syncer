@@ -71,15 +71,42 @@ void CPlayer::SetVelocity(CVector3 velocity)
 	ped->m_vecMoveSpeed = CVector(velocity.x, velocity.y, velocity.z);
 }
 
-void CPlayer::StreamIn(CVector3 position)
+bool CPlayer::IsDucked() const
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return false;
+
+	CTaskSimpleDuck* duckTask = ped->m_pIntelligence->GetTaskDuck(true);
+	if (duckTask == nullptr) return false;
+	if (duckTask->m_bIsFinished || duckTask->m_bIsAborting) return false;
+
+	return true;
+}
+
+void CPlayer::SetDucked(bool isDucked)
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return;
+	if (this->IsDucked() == isDucked) return;
+
+	CTaskSimpleDuckToggle duckToggle(isDucked ? 1 : 0);
+	duckToggle.ProcessPed(ped);
+}
+
+void CPlayer::StreamIn(PlayerUpdateData data, bool isDucked)
 {
 	if (this->m_bIsStreamedIn) return;
 
-	CPlayerPed* ped = CPlayerManager::CreatePlayerPed(this->m_iID, this->m_iSkin, position);
+	CPlayerPed* ped = CPlayerManager::CreatePlayerPed(this->m_iID, this->m_iSkin, data.m_vCurrentPosition);
 	if (ped == nullptr) return;
 
 	this->SetPed(ped);
+	ped->m_fCurrentRotation = data.m_fAimingRotation;
+	ped->m_fAimingRotation = data.m_fAimingRotation;
 	this->m_bIsStreamedIn = true;
+
+	this->Update(data);
+	this->SetDucked(isDucked);
 }
 
 void CPlayer::StreamOut()
@@ -101,26 +128,6 @@ float CPlayer::GetInterpolationTime()
 	return fTime;
 }
 
-void CPlayer::Process()
-{
-	if (!this->m_bUpdateDataAvailable) return;
-
-	CPlayerPed* ped = this->GetPed();
-	if (ped == nullptr) return;
-
-	float interpolation = this->GetInterpolationTime();
-	auto lData = this->m_lastUpdateData;
-	auto nData = this->m_updateData;
-
-	this->SetPosition(CInterpolate::Value(lData.m_vCurrentPosition, nData.m_vCurrentPosition, interpolation));
-	this->SetVelocity(CInterpolate::Value(lData.m_vMoveSpeed, nData.m_vMoveSpeed, interpolation));
-	
-	// update aiming rotation only when difference is too big, otherwise player controls will handle it
-	float aimingRotation = CInterpolate::Angle(lData.m_fAimingRotation, nData.m_fAimingRotation, interpolation);
-	float difference = std::abs(CInterpolate::AngleDifference(ped->m_fAimingRotation, aimingRotation));
-	if(difference > 45) ped->m_fAimingRotation = aimingRotation;
-}
-
 CPackets::PlayerUpdatePacket CPlayer::BuildUpdatePacket()
 {
 	CPlayerPed* ped = this->GetPed();
@@ -128,7 +135,7 @@ CPackets::PlayerUpdatePacket CPlayer::BuildUpdatePacket()
 
 	CPad* pad = ped->GetPadFromPlayer();
 	CControllerState state = pad->NewState;
-	CPackets::CPlayerControls controls{
+	CPlayerControls controls{
 		state.LeftStickX,
 		state.LeftStickY,
 		state.RightShoulder1,
@@ -140,13 +147,15 @@ CPackets::PlayerUpdatePacket CPlayer::BuildUpdatePacket()
 	};
 
 	CPackets::PlayerUpdatePacket packet(this->m_iID);
-	CPackets::PlayerUpdateData data{
-		this->GetPosition(),			// m_vCurrentPosition
-		this->GetVelocity(),			// m_vMoveSpeed
-		TheCamera.m_fOrientation,		// m_fCameraOrientation
-		ped->m_fAimingRotation,			// m_fAimingRotation
+	PlayerUpdateData data{
+		this->GetPosition(),					// m_vCurrentPosition
+		this->GetVelocity(),					// m_vMoveSpeed
+		TheCamera.m_fOrientation,				// m_fCameraOrientation
+		ped->m_fAimingRotation,					// m_fAimingRotation
+		ped->m_pPlayerData->m_fMoveBlendRatio,	// m_fMoveBlendRatio
+		ped->m_nMoveState,						// m_iMoveState
 
-		controls						// m_controls
+		controls								// m_controls
 	};
 
 	packet.data = data;
@@ -154,10 +163,70 @@ CPackets::PlayerUpdatePacket CPlayer::BuildUpdatePacket()
 	return packet;
 }
 
-void CPlayer::Update(CPackets::PlayerUpdatePacket packet)
+void CPlayer::HandleTask(CPackets::PlayerTaskPacket* packet)
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return;
+
+	eTaskType activeTask = ped->m_pIntelligence->m_TaskMgr.GetActiveTask()->GetId();
+	switch (packet->taskType)
+    {
+        case eTaskType::TASK_COMPLEX_JUMP:
+        {
+            if (activeTask == eTaskType::TASK_COMPLEX_JUMP) break;
+            if (this->IsDucked()) this->SetDucked(false);
+
+            CVector3 pos = packet->taskData.position;
+            ped->m_matrix->pos = CVector(pos.x, pos.y, pos.z);
+            ped->m_fCurrentRotation = packet->taskData.rotation;
+            ped->m_pIntelligence->m_TaskMgr.SetTask(new CTaskComplexJump(0), 3, false);
+
+            break;
+        }
+
+        case eTaskType::TASK_SIMPLE_DUCK:
+        {
+            this->SetDucked(packet->taskData.toggle);
+            break;
+        }
+
+        default:
+        {
+            printf("Unknown task received %d", packet->taskType);
+            break;
+        }
+    }
+}
+
+void CPlayer::Update(PlayerUpdateData data)
 {
 	this->m_lastUpdateData = this->m_updateData;
-	this->m_updateData = packet.data;
+	this->m_updateData = data;
 	this->m_bUpdateDataAvailable = true;
 	this->m_lastUpdateTick = GetTickCount64();
+}
+
+void CPlayer::Process()
+{
+	if (!this->m_bUpdateDataAvailable) return;
+
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return;
+
+	eTaskType activeTask = ped->m_pIntelligence->m_TaskMgr.GetActiveTask()->GetId();
+
+	float interpolation = this->GetInterpolationTime();
+	auto lData = this->m_lastUpdateData;
+	auto nData = this->m_updateData;
+
+	this->SetPosition(CInterpolate::Value(lData.m_vCurrentPosition, nData.m_vCurrentPosition, interpolation));
+
+	// dont apply velocity when player is jumping
+	if (activeTask != eTaskType::TASK_COMPLEX_JUMP)
+		this->SetVelocity(CInterpolate::Value(lData.m_vMoveSpeed, nData.m_vMoveSpeed, interpolation));
+
+	// update aiming rotation only when difference is too big, otherwise player controls will handle it
+	float aimingRotation = CInterpolate::Angle(lData.m_fAimingRotation, nData.m_fAimingRotation, interpolation);
+	float difference = std::abs(CInterpolate::AngleDifference(ped->m_fAimingRotation, aimingRotation));
+	if (difference > 45) ped->m_fAimingRotation = aimingRotation;
 }

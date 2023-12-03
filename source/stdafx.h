@@ -19,6 +19,8 @@
 #include "CStreaming.h"
 #include "CCamera.h"
 #include "CTheZones.h"
+#include "CTaskSimpleDuckToggle.h"
+#include "CTaskComplexJump.h"
 
 using namespace plugin;
 

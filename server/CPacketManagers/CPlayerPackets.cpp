@@ -19,7 +19,7 @@ void CPlayerPackets::HandshakePacket(ENetPeer* peer, void* p, int size)
 	CPlayer* player = CPlayerManager::GetPlayer(packet->nickname);
 	if (player != nullptr)
 	{
-		CPlayerManager::KickPlayer(player, "Player with this nickname is already connected");
+		CPlayerManager::KickPlayer(peer, "Player with this nickname is already connected");
 		CConsole::Print("Player '%s' tried to connect, but player with this nickname is already connected", packet->nickname);
 		return;
 	}
@@ -58,6 +58,30 @@ void CPlayerPackets::PlayerUpdatePacket(ENetPeer* peer, void* p, int size)
 	player->m_updateData = packet->data;
 }
 
+void CPlayerPackets::PlayerTaskPacket(ENetPeer* peer, void* p, int size)
+{
+	if (size != sizeof(CPackets::PlayerTaskPacket)) return;
+	CPackets::PlayerTaskPacket* packet = (CPackets::PlayerTaskPacket*)p;
+	if (packet->id != CPackets::MessageId::PLAYER_TASK) return;
+
+	CPlayer* player = CPlayerManager::GetPlayer(peer);
+	if (player == nullptr) return;
+
+	// Save ducking
+	if (packet->taskType == 415) // TASK_SIMPLE_DUCK
+	{
+		player->m_bIsDucked = packet->taskData.toggle;
+	}
+
+	packet->playerId = player->m_iID;
+
+	auto streamedFor = CPlayerManager::GetStreamedInPlayers(player);
+	for (auto p : streamedFor)
+	{
+		CNetworking::SendPacket(p, packet, sizeof(CPackets::PlayerTaskPacket));
+	}
+}
+
 void CPlayerPackets::SendPlayerConnected(CPlayer* player)
 {
 	CPackets::PlayerConnectedPacket packet = CPackets::PlayerConnectedPacket(player->m_iID, player->GetName());
@@ -92,7 +116,9 @@ void CPlayerPackets::SendPlayerStreamIn(CPlayer* player, CPlayer* target)
 	if (player->IsStreamedFor(target)) return;
 
 	player->AddStreamedFor(target);
-	CPackets::PlayerStreamInPacket packet = CPackets::PlayerStreamInPacket(player->m_iID, player->GetPosition());
+	CPackets::PlayerStreamInPacket packet = CPackets::PlayerStreamInPacket(player->m_iID);
+	packet.data = player->BuildUpdatePacket().data;
+	packet.isDucked = player->m_bIsDucked;
 	CNetworking::SendPacket(target, &packet, sizeof(CPackets::PlayerStreamInPacket));
 }
 
@@ -158,6 +184,7 @@ void CPlayerPackets::Init()
 {
 	CNetworking::RegisterListener(CPlayerPackets::HandshakePacket);
 	CNetworking::RegisterListener(CPlayerPackets::PlayerUpdatePacket);
+	CNetworking::RegisterListener(CPlayerPackets::PlayerTaskPacket);
 
 	CTimers::CreateTimer((int)(1000 / CCore::tickRate), 0, CPlayerPackets::SendPlayersUpdate);
 }

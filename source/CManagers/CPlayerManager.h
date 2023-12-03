@@ -24,5 +24,6 @@ public:
 	static CPlayer* GetPlayer(std::string name) { for (auto player : m_pPlayers) { if (player->GetName() == name) return player; } return nullptr; }
 	static CPlayer* GetPlayer(CPlayerPed* ped) { for (auto player : m_pPlayers) { if (player->GetPed() == ped) return player; } return nullptr; }
 	static CPlayer* GetPlayer(CPed* ped) { for (auto player : m_pPlayers) { if (player->GetPed() == ped) return player; } return nullptr; }
+	static CPlayer* GetPlayer(CTaskManager* taskManager) { for (auto player : m_pPlayers) { if (player->GetPed() && &player->GetPed()->m_pIntelligence->m_TaskMgr == taskManager) return player; } return nullptr; }
 	static std::vector<CPlayer*> GetPlayers() { return m_pPlayers; }
 };

@@ -25,6 +25,14 @@ void CPlayerManager::KickPlayer(CPlayer* player, const char* reason)
 	CConsole::Print("Player '%s' (%d) has been kicked from the server! Reason: %s", player->GetName(), player->m_iID, reason);
 }
 
+void CPlayerManager::KickPlayer(ENetPeer* peer, const char* reason)
+{
+	CPlayer* player = CPlayerManager::GetPlayer(peer);
+	if (player == nullptr) return;
+
+	CPlayerManager::KickPlayer(player, reason);
+}
+
 void CPlayerManager::PlayerDisconnected(CPlayer* player)
 {
 	CConsole::Print("Player '%s' (%d) has disconnected from the server!", player->GetName(), player->m_iID);

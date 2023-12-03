@@ -4,6 +4,45 @@
 #include "CVector3.h"
 #include <string.h>
 
+struct ServerInfo
+{
+	char name[MAX_SERVER_NAME] = {};
+	int tickRate;
+	int maxPlayers;
+};
+
+struct CPlayerControls
+{
+	short LeftStickX;
+	short LeftStickY;
+	short RightShoulder1;
+	short m_bPedWalk;
+	short ButtonCircle;
+	short ButtonCross;
+	short ButtonSquare;
+	short ButtonTriangle;
+};
+
+struct PlayerUpdateData {
+	CVector3 m_vCurrentPosition;
+	CVector3 m_vMoveSpeed;
+	float m_fCameraOrientation;
+	float m_fAimingRotation;
+	float m_fMoveBlendRatio;
+	int m_iMoveState;
+
+	CPlayerControls m_controls;
+};
+
+struct TaskData
+{
+	TaskData() = default;
+
+	CVector3 position;
+	float rotation = 0.0f;
+	bool toggle = false;
+};
+
 class CPackets
 {
 public:
@@ -18,8 +57,9 @@ public:
 		PLAYER_STREAM_OUT = 5,
 
 		PLAYER_UPDATE = 6,
+		PLAYER_TASK = 7,
 
-		MASSIVE_PLAYER_UPDATE = 7,
+		MASSIVE_PLAYER_UPDATE = 8,
 	};
 
     struct Packet
@@ -40,13 +80,6 @@ public:
 		char nickname[MAX_NAME] = {};
 		char secret[sizeof(SERVER_SECRET)] = {};
 		CVector3 position = {};
-	};
-
-	struct ServerInfo
-	{
-		char name[MAX_SERVER_NAME] = {};
-		int tickRate;
-		int maxPlayers;
 	};
 
 	struct HandshakeResponsePacket : public Packet
@@ -90,15 +123,15 @@ public:
 
 	struct PlayerStreamInPacket : public Packet
 	{
-		PlayerStreamInPacket(int playerId, CVector3 position)
+		PlayerStreamInPacket(int playerId)
 		{
 			id = PLAYER_STREAM_IN;
 			this->playerId = playerId;
-			this->position = position;
 		}
 
 		int playerId;
-		CVector3 position = {};
+		PlayerUpdateData data = {};
+		bool isDucked = false;
 	};
 
 	struct PlayerStreamOutPacket : public Packet
@@ -110,27 +143,6 @@ public:
 		}
 
 		int playerId;
-	};
-
-	struct CPlayerControls
-	{
-		short LeftStickX;
-		short LeftStickY;
-		short RightShoulder1;
-		short m_bPedWalk;
-		short ButtonCircle;
-		short ButtonCross;
-		short ButtonSquare;
-		short ButtonTriangle;
-	};
-
-	struct PlayerUpdateData {
-		CVector3 m_vCurrentPosition;
-		CVector3 m_vMoveSpeed;
-		float m_fCameraOrientation;
-		float m_fAimingRotation;
-
-		CPlayerControls m_controls;
 	};
 
 	struct PlayerUpdatePacket : public Packet
@@ -145,6 +157,20 @@ public:
 
 		int playerId;
 		PlayerUpdateData data = {};
+	};
+
+	struct PlayerTaskPacket : public Packet
+	{
+		PlayerTaskPacket(int taskType, TaskData taskData = {})
+		{
+			id = PLAYER_TASK;
+			this->taskType = taskType;
+			this->taskData = taskData;
+		}
+
+		int playerId;
+		int taskType;
+		TaskData taskData;
 	};
 
 	struct MassivePlayerUpdatePacket : public Packet

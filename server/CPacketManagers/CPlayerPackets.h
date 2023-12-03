@@ -5,6 +5,7 @@ class CPlayerPackets
 public:
     static void HandshakePacket(ENetPeer* peer, void* p, int size);
     static void PlayerUpdatePacket(ENetPeer* peer, void* p, int size);
+    static void PlayerTaskPacket(ENetPeer* peer, void* p, int size);
 
     static void SendPlayerConnected(CPlayer* player);
     static void SendPlayerConnected(CPlayer* player, CPlayer* target);

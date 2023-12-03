@@ -8,8 +8,10 @@ public:
     static void PlayerDisconnectedPacket(void* p, int size);
     static void PlayerStreamInPacket(void* p, int size);
     static void PlayerStreamOutPacket(void* p, int size);
+    static void PlayerTaskPacket(void* p, int size);
     static void MassivePlayerUpdatePacket(void* p, int size);
 
+    static void SendPlayerTaskPacket(int task, TaskData data);
     static void SendPlayerUpdatePacket();
 
     static void InitPlayerUpdateTimer();

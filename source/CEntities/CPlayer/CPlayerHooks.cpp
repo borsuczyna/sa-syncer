@@ -39,6 +39,24 @@ CPad* __cdecl CPlayerHooks::GetPad(int number)
 	return &CPlayerManager::Pads[CWorld::PlayerInFocus];
 }
 
+void __fastcall CPlayerHooks::SetRealMoveAnim(CPlayerPed* _this)
+{
+	CPlayer* player = CPlayerManager::GetPlayer(_this);
+	CPlayer* localPlayer = CPlayerManager::GetLocalPlayer();
+
+	if (player != nullptr && localPlayer->GetPed() != _this)
+	{
+		auto lData = player->m_lastUpdateData;
+		auto cData = player->m_updateData;
+		float interpolation = player->GetInterpolationTime();
+
+		_this->m_fAimingRotation = CInterpolate::Angle(lData.m_fAimingRotation, cData.m_fAimingRotation, interpolation);
+		_this->m_nMoveState = cData.m_iMoveState;
+	}
+
+	plugin::CallMethod<0x60A9C0, CPlayerPed*>(_this);
+}
+
 void __fastcall CPlayerHooks::ProcessControl(CPlayerPed* This)
 {
 	static void(__thiscall * CPlayerPed__ProcessControl)(CPlayerPed * This) = decltype(CPlayerPed__ProcessControl)(0x60EA90);
@@ -71,7 +89,7 @@ void __fastcall CPlayerHooks::ProcessControl(CPlayerPed* This)
 		// Get all required data
 		CPad* pad = This->GetPadFromPlayer();
 		CPlayerInfo* playerInfo = This->GetPlayerInfoForThisPlayerPed();
-		CPackets::CPlayerControls controls = player->m_updateData.m_controls;
+		CPlayerControls controls = player->m_updateData.m_controls;
 
 		// Save current camera state
 		float cameraOrientation = TheCamera.m_fOrientation;
@@ -108,5 +126,95 @@ void __fastcall CPlayerHooks::ProcessControl(CPlayerPed* This)
 		return;
 	}
 
+	// Check ducking
+	CPlayer* player = CPlayerManager::GetLocalPlayer();
+	static bool networkDucked = false;
+	if (player->IsDucked() != networkDucked) {
+
+		bool isDucked = player->IsDucked();
+
+		TaskData data;
+		data.position = localPlayer->GetPosition();
+		data.rotation = localPlayer->GetPed()->m_fCurrentRotation;
+		data.toggle = isDucked;
+
+		CPlayerPackets::SendPlayerTaskPacket(eTaskType::TASK_SIMPLE_DUCK, data);
+
+		networkDucked = isDucked;
+	}
+
 	CPlayerPed__ProcessControl(This);
+}
+
+bool __fastcall CPlayerHooks::JumpJustDown(CPad* This)
+{
+	CPlayer* localPlayer = CPlayerManager::GetLocalPlayer();
+	CPlayerPed* ped = localPlayer->GetPed();
+	if (ped == nullptr) return false;
+
+	if (This == ped->GetPadFromPlayer())
+	{
+		if (CPatches::IsWindowFocused())
+		{
+			if (!This->DisablePlayerControls && !This->bDisablePlayerDuck && This->NewState.ButtonSquare)
+				return true;
+		}
+	}
+	return false;
+}
+
+void __fastcall CPlayerHooks::SetTask(CTaskManager* This, DWORD EDX, CTask* task, int tasksId, bool unused)
+{
+	CPlayer* localPlayer = CPlayerManager::GetLocalPlayer();
+	if (FindPlayerPed(0) == This->m_pPed)
+	{
+		if (task)
+		{
+			int taskID = task->GetId();
+			if (taskID == eTaskType::TASK_COMPLEX_JUMP)
+			{
+				if (!CPatches::IsWindowFocused()) return; // dont process jump when game is not focused
+
+				TaskData data;
+				data.position = localPlayer->GetPosition();
+				data.rotation = localPlayer->GetPed()->m_fCurrentRotation;
+
+				CPlayerPackets::SendPlayerTaskPacket(eTaskType::TASK_COMPLEX_JUMP, data);
+			}
+		}
+		else
+		{
+			CTask* _task = This->m_aPrimaryTasks[tasksId];
+			//if (_task)printf("New task for player ped: nullptr %d: %s\n", _task->GetId(), TaskNames[_task->GetId()]);
+		}
+	}
+	else
+	{
+		if (task)
+		{
+			int taskID = task->GetId();
+			if (taskID == eTaskType::TASK_COMPLEX_JUMP) return;
+		}
+	}
+
+	This->SetTask(task, tasksId, unused);
+}
+
+void __fastcall CPlayerHooks::SetTaskSecondary(CTaskManager* This, DWORD EDX, CTask* task, int tasksId)
+{
+	CPlayer* localPlayer = CPlayerManager::GetLocalPlayer();
+	if (FindPlayerPed(0) == This->m_pPed)
+	{
+		if (task)
+		{
+			int taskID = task->GetId();
+			//printf("New task for player ped: %d: %s\n", taskID, TaskNames[taskID]);
+		}
+		else
+		{
+			CTask* _task = This->m_aSecondaryTasks[tasksId];
+			//if (_task)printf("New task for player ped: nullptr %d: %s\n", _task->GetId(), TaskNames[_task->GetId()]);
+		}
+	}
+	This->SetTaskSecondary(task, tasksId);
 }

@@ -6,8 +6,8 @@ class CPlayer
 	char m_szName[MAX_NAME];
 
 public:
-	CPackets::PlayerUpdateData m_updateData = {};
-	CPackets::PlayerUpdateData m_lastUpdateData = {};
+	PlayerUpdateData m_updateData = {};
+	PlayerUpdateData m_lastUpdateData = {};
 	bool m_bUpdateDataAvailable = false;
 	ULONGLONG m_lastUpdateTick = 0;
 
@@ -25,15 +25,18 @@ public:
 	void SetPosition(CVector3 position);
 	CVector3 GetVelocity() const;
 	void SetVelocity(CVector3 velocity);
+	bool IsDucked() const;
+	void SetDucked(bool isDucked);
 
 	const char* GetName() const;
 	void SetName(const char* name);
 
-	void StreamIn(CVector3 position);
+	void StreamIn(PlayerUpdateData data, bool isDucked);
 	void StreamOut();
 
 	float GetInterpolationTime();
-	void Process();
 	CPackets::PlayerUpdatePacket BuildUpdatePacket();
-	void Update(CPackets::PlayerUpdatePacket packet);
+	void HandleTask(CPackets::PlayerTaskPacket* packet);
+	void Update(PlayerUpdateData data);
+	void Process();
 };

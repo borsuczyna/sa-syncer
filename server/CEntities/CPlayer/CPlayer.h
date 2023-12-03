@@ -8,7 +8,8 @@ private:
 public:
     int m_iID;
     ENetPeer* m_pPeer = nullptr;
-    CPackets::PlayerUpdateData m_updateData;
+    PlayerUpdateData m_updateData;
+    bool m_bIsDucked = false;
 
     CPlayer(int id, const char* name, ENetPeer* peer);
     ~CPlayer();

@@ -84,6 +84,22 @@ void PlayerControlsHooks()
         return CHooks::AdjustBranchPointer(Address, 0x56E0D0, CPlayerHooks::FindPlayerVehicleHook, false);
     });
 
+    CHooks::Patch_Funcs.push_back([](uint32_t Address) -> bool
+    {
+        return CHooks::AdjustBranchPointer(Address, 0x60A9C0, CPlayerHooks::SetRealMoveAnim, true);
+    });
+
+    CHooks::Patch_Funcs.push_back([](uint32_t Address) -> bool
+    {
+        return CHooks::AdjustBranchPointer(Address, 0x681AF0, CPlayerHooks::SetTask, false);
+    });
+
+    CHooks::Patch_Funcs.push_back([](uint32_t Address) -> bool
+    {
+        return CHooks::AdjustBranchPointer(Address, 0x681B60, CPlayerHooks::SetTaskSecondary, false);
+    });
+
+    patch::ReplaceFunction(0x540770, CPlayerHooks::JumpJustDown);
     patch::SetPointer(0x86D190, CPlayerHooks::ProcessControl);
 }
 

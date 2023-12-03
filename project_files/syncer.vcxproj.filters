@@ -52,9 +52,6 @@
     <Filter Include="CEntities">
       <UniqueIdentifier>{93370b80-647d-4c77-9e32-9c8934ee13b7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CEntities\CPlayer">
-      <UniqueIdentifier>{f9c1373b-84e9-4b6e-b9ef-d65ab7cdb2db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="CConsole">
       <UniqueIdentifier>{6a95ed2b-e55e-48ea-88ce-653952551439}</UniqueIdentifier>
     </Filter>
@@ -78,6 +75,9 @@
     </Filter>
     <Filter Include="CDiscordRPC\include">
       <UniqueIdentifier>{77ac3762-8b17-40c3-ab38-cf16feaeac08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CEntities\CPlayer">
+      <UniqueIdentifier>{f9c1373b-84e9-4b6e-b9ef-d65ab7cdb2db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
