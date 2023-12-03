@@ -1,0 +1,8 @@
+C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\CConsole\CConsole.cpp;C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\Release\CConsole.obj
+C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\CCore\CCore.cpp;C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\Release\CCore.obj
+C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\CEntities\CPlayer\CPlayer.cpp;C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\Release\CPlayer.obj
+C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\CManagers\CPlayerManager.cpp;C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\Release\CPlayerManager.obj
+C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\CNetworking\CNetworking.cpp;C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\Release\CNetworking.obj
+C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\CPacketManagers\CPlayerPackets.cpp;C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\Release\CPlayerPackets.obj
+C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\CTimers\CTimers.cpp;C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\Release\CTimers.obj
+C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\server.cpp;C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\server\Release\server.obj

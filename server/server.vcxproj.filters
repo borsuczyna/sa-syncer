@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="server.cpp" />
+    <ClCompile Include="CConsole\CConsole.cpp">
+      <Filter>CConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="CCore\CCore.cpp">
+      <Filter>CCore</Filter>
+    </ClCompile>
+    <ClCompile Include="CNetworking\CNetworking.cpp">
+      <Filter>CNetworking</Filter>
+    </ClCompile>
+    <ClCompile Include="CManagers\CPlayerManager.cpp">
+      <Filter>CManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="CPacketManagers\CPlayerPackets.cpp">
+      <Filter>CPacketManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="CTimers\CTimers.cpp">
+      <Filter>CTimers</Filter>
+    </ClCompile>
+    <ClCompile Include="CEntities\CPlayer\CPlayer.cpp">
+      <Filter>CEntities\CPlayer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CConsole">
+      <UniqueIdentifier>{9700256d-4e1b-435d-adb4-204850a54d83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CCore">
+      <UniqueIdentifier>{90d2eb87-6cf1-4637-94ab-a10def799579}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CNetworking">
+      <UniqueIdentifier>{2632a9c8-a71b-46b5-8b06-5cba613940d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CEntities">
+      <UniqueIdentifier>{523db43c-3a75-44d4-8b18-7ac1e5fc8a06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CManagers">
+      <UniqueIdentifier>{676b612a-2b86-4479-9547-a1aad9167113}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CPacketManagers">
+      <UniqueIdentifier>{fd323813-741d-47b0-adb9-21eb868a2c13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CTimers">
+      <UniqueIdentifier>{36991f1b-0369-42cb-ab96-5bc2a2295787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CEntities\CPlayer">
+      <UniqueIdentifier>{7b956ed3-21d3-415f-9956-e0992cc50536}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CConsole\CConsole.h">
+      <Filter>CConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="CCore\CCore.h">
+      <Filter>CCore</Filter>
+    </ClInclude>
+    <ClInclude Include="CNetworking\CNetworking.h">
+      <Filter>CNetworking</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="CManagers\CPlayerManager.h">
+      <Filter>CManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="CPacketManagers\CPlayerPackets.h">
+      <Filter>CPacketManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="CTimers\CTimers.h">
+      <Filter>CTimers</Filter>
+    </ClInclude>
+    <ClInclude Include="CEntities\CPlayer\CPlayer.h">
+      <Filter>CEntities\CPlayer</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

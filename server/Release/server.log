@@ -1,0 +1,14 @@
+﻿  CConsole.cpp
+  CCore.cpp
+  CPlayer.cpp
+  CPlayerManager.cpp
+  CNetworking.cpp
+  CPlayerPackets.cpp
+  CTimers.cpp
+  server.cpp
+  Generating code
+  14 of 404 functions ( 3.5%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    6 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  server.vcxproj -> C:\Users\libxx\Desktop\pluginsdk\tools\myplugin-gen\generated\syncer\project_files\Release\server.exe

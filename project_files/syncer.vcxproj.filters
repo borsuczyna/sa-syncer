@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\source\Main.cpp" />
+    <ClCompile Include="..\source\CHooks\CHooks.cpp">
+      <Filter>CHooks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CHooks\CPatches.cpp">
+      <Filter>CHooks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CCore\CCore.cpp">
+      <Filter>CCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CManagers\CPlayerManager.cpp">
+      <Filter>CManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CEntities\CPlayer\CPlayer.cpp">
+      <Filter>CEntities\CPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CEntities\CPlayer\CPlayerHooks.cpp">
+      <Filter>CEntities\CPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CConsole\CConsole.cpp">
+      <Filter>CConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CNetworking\CNetworking.cpp">
+      <Filter>CNetworking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CUtils\CNickGenerator.cpp">
+      <Filter>CUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CPacketManagers\CPlayerPackets.cpp">
+      <Filter>CPacketManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CTimers\CTimers.cpp">
+      <Filter>CTimers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CHooks">
+      <UniqueIdentifier>{dfcec59a-e774-445b-a878-39aa7e01f36c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CCore">
+      <UniqueIdentifier>{8f999465-8edc-47b5-a432-bb5c7702d74e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CManagers">
+      <UniqueIdentifier>{11a4ec25-1c57-4b0b-aff8-14aff7493e7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CEntities">
+      <UniqueIdentifier>{93370b80-647d-4c77-9e32-9c8934ee13b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CEntities\CPlayer">
+      <UniqueIdentifier>{f9c1373b-84e9-4b6e-b9ef-d65ab7cdb2db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CConsole">
+      <UniqueIdentifier>{6a95ed2b-e55e-48ea-88ce-653952551439}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CNetworking">
+      <UniqueIdentifier>{eed862d3-5dc3-499f-a946-2829be1dbeb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CUtils">
+      <UniqueIdentifier>{b6d066ec-b4b8-44a6-8767-22387f7150cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CPacketManagers">
+      <UniqueIdentifier>{a70e340c-20bc-48ed-8924-f299a30fa08f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CTimers">
+      <UniqueIdentifier>{edb1a819-a0a7-4c16-a79a-146b9aedf49d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\CHooks\CHooks.h">
+      <Filter>CHooks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CHooks\CPatches.h">
+      <Filter>CHooks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\stdafx.h" />
+    <ClInclude Include="..\source\CCore\CCore.h">
+      <Filter>CCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CManagers\CPlayerManager.h">
+      <Filter>CManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CEntities\CPlayer\CPlayer.h">
+      <Filter>CEntities\CPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CEntities\CPlayer\CPlayerHooks.h">
+      <Filter>CEntities\CPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CConsole\CConsole.h">
+      <Filter>CConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CNetworking\CNetworking.h">
+      <Filter>CNetworking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CUtils\CNickGenerator.h">
+      <Filter>CUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CPacketManagers\CPlayerPackets.h">
+      <Filter>CPacketManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CTimers\CTimers.h">
+      <Filter>CTimers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

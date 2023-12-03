@@ -1,0 +1,4 @@
+/project_files/.vs/*
+/project_files/Release/*
+/project_files/Debug/*
+/output/*
