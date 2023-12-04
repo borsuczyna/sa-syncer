@@ -3,6 +3,9 @@
 ENetHost* CNetworking::m_pServer = nullptr;
 std::vector<CPacketListener*> CNetworking::m_listeners = std::vector<CPacketListener*>();
 
+template void CNetworking::SendMassiveData<CPackets::PlayerAimPacket>(CPlayer*, const std::vector<CPackets::PlayerAimPacket>&, CPackets::MessageId);
+template void CNetworking::SendMassiveData<CPackets::PlayerUpdatePacket>(CPlayer*, const std::vector<CPackets::PlayerUpdatePacket>&, CPackets::MessageId);
+
 void CNetworking::SendPacket(CPackets::MessageId messageId, ENetPeer* peer, void* packet, int size)
 {
     char* buffer = new char[size + sizeof(CPackets::MessageId)];
@@ -52,6 +55,15 @@ void CNetworking::ClientDisconnect(ENetPeer* peer)
     CPlayerManager::PlayerDisconnected(player);
 
 	enet_peer_disconnect(peer, 0);
+}
+
+template<typename T>
+void CNetworking::SendMassiveData(CPlayer* player, const std::vector<T>& data, CPackets::MessageId messageId)
+{
+    size_t size = 0;
+    char* serializedData = CMassSerializer::SerializeMessage(data.size(), data, size);
+    CNetworking::SendPacket(messageId, player, serializedData, size);
+    delete[] serializedData;
 }
 
 void CNetworking::Init(int port)

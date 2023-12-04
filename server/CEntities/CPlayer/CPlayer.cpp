@@ -58,3 +58,13 @@ CPackets::PlayerUpdatePacket CPlayer::BuildUpdatePacket()
 
 	return packet;
 }
+
+CPackets::PlayerAimPacket CPlayer::BuildAimPacket()
+{
+	CPackets::PlayerAimPacket packet;
+	packet.playerId = this->m_iID;
+	packet.data = this->m_updateData;
+	packet.aimTarget = this->m_vAimTarget;
+
+	return packet;
+}

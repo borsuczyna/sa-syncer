@@ -93,6 +93,38 @@ void CPlayer::SetDucked(bool isDucked)
 	duckToggle.ProcessPed(ped);
 }
 
+void CPlayer::AimAt(CVector3 position)
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return;
+
+	CTaskSimpleUseGun* useGun = ped->m_pIntelligence->GetTaskUseGun();
+	if (!useGun)
+	{
+		auto* taskUseGun = new CTaskSimpleUseGun(ped->m_pTargetedObject, CVector(0.0f, 0.0f, 0.f), 1, 1, false);
+		ped->m_pIntelligence->m_TaskMgr.SetTaskSecondary(taskUseGun, TASK_SECONDARY_ATTACK);
+	}
+
+	useGun = ped->m_pIntelligence->GetTaskUseGun();
+
+	if (useGun)
+	{
+		useGun->m_vecTarget = CVector(position.x, position.y, position.z);
+	}
+}
+
+void CPlayer::StopAiming()
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return;
+
+	CTaskSimpleUseGun* useGun = ped->m_pIntelligence->GetTaskUseGun();
+	if (useGun)
+	{
+		useGun->m_bIsFinished = true;
+	}
+}
+
 void CPlayer::GiveWeapon(eWeaponType weaponType, unsigned int ammo, bool armed)
 {
 	CPlayerPed* ped = this->GetPed();
@@ -126,6 +158,36 @@ void CPlayer::SetWeapon(eWeaponType weaponType, unsigned int ammoInClip, unsigne
 		weapon->m_nAmmoInClip = ammoInClip;
 		weapon->m_nTotalAmmo = ammoTotal;
 	}
+}
+
+bool CPlayer::IsAiming() const
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return false;
+
+	eCamMode mode = TheCamera.m_aCams[TheCamera.m_nActiveCam].m_nMode;
+	return (mode == eCamMode::MODE_AIMING
+		|| mode == eCamMode::MODE_AIMWEAPON
+		|| mode == eCamMode::MODE_AIMWEAPON_ATTACHED
+		|| mode == eCamMode::MODE_AIMWEAPON_FROMCAR
+		|| mode == eCamMode::MODE_ROCKETLAUNCHER
+		|| mode == eCamMode::MODE_ROCKETLAUNCHER_HS
+		|| mode == eCamMode::MODE_ROCKETLAUNCHER_RUNABOUT
+		|| mode == eCamMode::MODE_ROCKETLAUNCHER_RUNABOUT_HS);
+}
+
+CVector3 CPlayer::GetAimTarget() const
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return CVector3();
+
+	CVector source = ped->GetPosition();
+	source.z += 0.7f;
+	CVector pCamVec;
+	CVector aimTarget;
+	TheCamera.Find3rdPersonCamTargetVector(20.0f, source, &pCamVec, (CVector*)&aimTarget);
+
+	return CVector3(aimTarget.x, aimTarget.y, aimTarget.z);
 }
 
 void CPlayer::StreamIn(PlayerUpdateData data, bool isDucked)
@@ -204,6 +266,19 @@ CPackets::PlayerUpdatePacket CPlayer::BuildUpdatePacket()
 	return packet;
 }
 
+CPackets::PlayerAimPacket CPlayer::BuildAimPacket()
+{
+	CPlayerPed* ped = this->GetPed();
+	if (ped == nullptr) return CPackets::PlayerAimPacket();
+
+	CPackets::PlayerUpdatePacket defaultPacket = this->BuildUpdatePacket();
+	CPackets::PlayerAimPacket packet(this->m_iID, this->GetAimTarget());
+
+	packet.data = defaultPacket.data;
+
+	return packet;
+}
+
 void CPlayer::HandleTask(CPackets::PlayerTaskPacket* packet)
 {
 	CPlayerPed* ped = this->GetPed();
@@ -247,6 +322,14 @@ void CPlayer::Update(PlayerUpdateData data)
 	this->m_lastUpdateTick = GetTickCount64();
 
 	this->SetWeapon((eWeaponType)data.m_iCurrentWeapon, data.m_iAmmoInClip, data.m_iAmmoTotal);
+	this->m_bIsAiming = false;
+}
+
+void CPlayer::UpdateAim(CVector3 aimTarget)
+{
+	this->m_lastAimAt = this->m_vecAimAt;
+	this->m_vecAimAt = aimTarget;
+	this->m_bIsAiming = true;
 }
 
 void CPlayer::Process()
@@ -272,4 +355,13 @@ void CPlayer::Process()
 	float aimingRotation = CInterpolate::Angle(lData.m_fAimingRotation, nData.m_fAimingRotation, interpolation);
 	float difference = std::abs(CInterpolate::AngleDifference(ped->m_fAimingRotation, aimingRotation));
 	if (difference > 45) ped->m_fAimingRotation = aimingRotation;
+
+	// update aiming
+	if (this->m_bIsAiming)
+	{
+		CVector3 aimAt = CInterpolate::Value(this->m_lastAimAt, this->m_vecAimAt, interpolation);
+		this->AimAt(aimAt);
+		ped->m_fCurrentRotation = CInterpolate::Angle(lData.m_fAimingRotation, nData.m_fAimingRotation, interpolation);
+		ped->m_fAimingRotation = CInterpolate::Angle(lData.m_fAimingRotation, nData.m_fAimingRotation, interpolation);
+	}
 }

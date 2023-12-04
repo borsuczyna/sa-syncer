@@ -78,6 +78,23 @@ void CPlayerPackets::MassivePlayerUpdatePacket(void* p, int size)
 	}
 }
 
+void CPlayerPackets::MassivePlayerAimPacket(void* p, int size)
+{
+	char* buffer = static_cast<char*>(p);
+
+	size_t count;
+	std::vector<CPackets::PlayerAimPacket> data = CMassSerializer::DeserializeMessage<CPackets::PlayerAimPacket>(buffer, count);
+
+	for (auto item : data)
+	{
+		CPlayer* player = CPlayerManager::GetPlayer(item.playerId);
+		if (player == nullptr) continue;
+
+		player->Update(item.data);
+		player->UpdateAim(item.aimTarget);
+	}
+}
+
 void CPlayerPackets::SendPlayerTaskPacket(int task, TaskData data)
 {
 	if (!CNetworking::m_bIsConnected) return;
@@ -94,8 +111,16 @@ void CPlayerPackets::SendPlayerUpdatePacket()
 	CPlayer* player = CPlayerManager::GetLocalPlayer();
 	if (player == nullptr) return;
 
-	CPackets::PlayerUpdatePacket packet = player->BuildUpdatePacket();
-	CNetworking::SendPacket(CPackets::MessageId::PLAYER_UPDATE, &packet, sizeof(CPackets::PlayerUpdatePacket));
+	if (player->IsAiming())
+	{
+		CPackets::PlayerAimPacket packet = player->BuildAimPacket();
+		CNetworking::SendPacket(CPackets::MessageId::PLAYER_AIM, &packet, sizeof(CPackets::PlayerAimPacket));
+	}
+	else
+	{
+		CPackets::PlayerUpdatePacket packet = player->BuildUpdatePacket();
+		CNetworking::SendPacket(CPackets::MessageId::PLAYER_UPDATE, &packet, sizeof(CPackets::PlayerUpdatePacket));
+	}
 }
 
 void CPlayerPackets::InitPlayerUpdateTimer()
@@ -118,4 +143,5 @@ void CPlayerPackets::Init()
 	CNetworking::RegisterListener(CPackets::MessageId::PLAYER_STREAM_OUT, CPlayerPackets::PlayerStreamOutPacket);
 	CNetworking::RegisterListener(CPackets::MessageId::PLAYER_TASK, CPlayerPackets::PlayerTaskPacket);
 	CNetworking::RegisterListener(CPackets::MessageId::MASSIVE_PLAYER_UPDATE, CPlayerPackets::MassivePlayerUpdatePacket);
+	CNetworking::RegisterListener(CPackets::MessageId::MASSIVE_PLAYER_AIM, CPlayerPackets::MassivePlayerAimPacket);
 }

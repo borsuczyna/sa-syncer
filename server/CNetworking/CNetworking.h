@@ -27,6 +27,9 @@ public:
 	static void BroadcastPacket(CPackets::MessageId messageId, CPlayer* exclude, void* packet, int size);
 	static void ClientDisconnect(ENetPeer* peer);
 
+	template<typename T>
+	static void SendMassiveData(CPlayer* player, const std::vector<T>& data, CPackets::MessageId messageId);
+
 	static void RegisterListener(CPackets::MessageId messageId, void(*callback)(ENetPeer*, void*, int));
 	static void UnregisterListener(CPackets::MessageId messageId, void(*callback)(ENetPeer*, void*, int));
 

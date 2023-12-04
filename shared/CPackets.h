@@ -61,9 +61,11 @@ public:
 		PLAYER_STREAM_OUT = 5,
 
 		PLAYER_UPDATE = 6,
-		PLAYER_TASK = 7,
+		PLAYER_AIM = 7,
+		PLAYER_TASK = 8,
 
-		MASSIVE_PLAYER_UPDATE = 8,
+		MASSIVE_PLAYER_UPDATE = 9,
+		MASSIVE_PLAYER_AIM = 10,
 	};
 
     struct HandshakePacket
@@ -150,6 +152,20 @@ public:
 		PlayerUpdateData data = {};
 	};
 
+	struct PlayerAimPacket
+	{
+		PlayerAimPacket() = default;
+		PlayerAimPacket(int playerId, CVector3 aimTarget)
+		{
+			this->playerId = playerId;
+			this->aimTarget = aimTarget;
+		}
+
+		int playerId;
+		PlayerUpdateData data = {};
+		CVector3 aimTarget = {};
+	};
+
 	struct PlayerTaskPacket
 	{
 		PlayerTaskPacket(int taskType, TaskData taskData = {})
@@ -161,16 +177,5 @@ public:
 		int playerId;
 		int taskType;
 		TaskData taskData;
-	};
-
-	struct MassivePlayerUpdatePacket
-	{
-		MassivePlayerUpdatePacket(int playersCount)
-		{
-			this->playerCount = playersCount;
-		}
-
-		size_t playerCount;
-		PlayerUpdatePacket players[MAX_SERVER_PLAYERS] = {};
 	};
 };
